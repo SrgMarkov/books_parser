@@ -32,6 +32,31 @@ def download_image(url, folder='images/'):
     return f"{folder}{picture_name}"
 
 
+def parse_book_page(content):
+    soup = BeautifulSoup(content.text, 'lxml')
+    title_tag = soup.find('h1').text.split('::')
+    picture_tag = soup.find('div', class_='bookimage').find('img')['src']
+    title = title_tag[0].strip()
+    author = title_tag[1].strip()
+    picture_url = urljoin(url, picture_tag)
+    comments = soup.find_all('div', class_="texts")
+    comments_text = []
+    for comment in comments:
+        comment_text = comment.text.split(')')[-1]
+        comments_text.append(comment_text)
+    genres = soup.find('span', class_='d_book').find_all('a')
+    book_genres = []
+    for genre in genres:
+        book_genres.append(genre.text)
+    book_info = {
+        'Заголовок': title,
+        'Автор': author,
+        'Обложка': picture_url,
+        'Комментарии': comments_text,
+        'Жанр': book_genres
+    }
+    return book_info
+
 for book in range(1, 11):
     url = f'https://tululu.org/b{book}/'
     download_url = f'https://tululu.org/txt.php?id={book}'
@@ -39,21 +64,7 @@ for book in range(1, 11):
     response.raise_for_status()
     try:
         check_for_redirect(response)
-        soup = BeautifulSoup(response.text, 'lxml')
-        title_tag = soup.find('h1').text.split('::')
-        picture_tag = soup.find('div', class_='bookimage').find('img')['src']
-        title = title_tag[0].strip()
-        author = title_tag[1].strip()
-        picture_url = urljoin(url, picture_tag)
-        comments = soup.find_all('div', class_="texts")
-        print(f'Заголовок: {title}')
-        # for comment in comments:
-        #     comment_text = comment.text.split(')')[-1]
-        #     print(comment_text)
-        genres = soup.find('span', class_='d_book').find_all('a',)
-        for genre in genres:
-            print(genre.text)
-        print()
+        print(parse_book_page(response))
         # download_image(picture_url)
         # download_txt(download_url, f'{book}. {title}', folder='books/')
     except requests.HTTPError:
