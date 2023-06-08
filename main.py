@@ -46,14 +46,15 @@ for book in range(1, 11):
         author = title_tag[1].strip()
         picture_url = urljoin(url, picture_tag)
         comments = soup.find_all('div', class_="texts")
-        print(title)
-        print(author)
+        print(f'Заголовок: {title}')
+        # for comment in comments:
+        #     comment_text = comment.text.split(')')[-1]
+        #     print(comment_text)
+        genres = soup.find('span', class_='d_book').find_all('a',)
+        for genre in genres:
+            print(genre.text)
         print()
-        for comment in comments:
-            comment_text = comment.text.split(')')[-1]
-            print(comment_text)
-
         # download_image(picture_url)
         # download_txt(download_url, f'{book}. {title}', folder='books/')
     except requests.HTTPError:
-        print(f"book is not available")
+        pass
