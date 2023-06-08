@@ -1,5 +1,6 @@
 import os
 import requests
+import argparse
 from bs4 import BeautifulSoup
 from pathvalidate import sanitize_filename
 from urllib.parse import urljoin, urlparse
@@ -57,15 +58,23 @@ def parse_book_page(content):
     }
     return book_info
 
-for book in range(1, 11):
-    url = f'https://tululu.org/b{book}/'
-    download_url = f'https://tululu.org/txt.php?id={book}'
-    response = requests.get(url)
-    response.raise_for_status()
-    try:
-        check_for_redirect(response)
-        print(parse_book_page(response))
-        # download_image(picture_url)
-        # download_txt(download_url, f'{book}. {title}', folder='books/')
-    except requests.HTTPError:
-        pass
+
+if __name__ == '__main__':
+    command_arguments = argparse.ArgumentParser(description='скачивание книг с сайта https://tululu.org/ Необходимо '
+                                                            'ввести обязательный аргументы - id с какого по какой '
+                                                            'загружать')
+    command_arguments.add_argument('start_id', help='с какого id начать загрузку', type=int)
+    command_arguments.add_argument('end_id', help='на каком id закончить загрузку', type=int)
+    args = command_arguments.parse_args()
+    for book in range(args.start_id, args.end_id + 1):
+        url = f'https://tululu.org/b{book}/'
+        download_url = f'https://tululu.org/txt.php?id={book}'
+        response = requests.get(url)
+        response.raise_for_status()
+        try:
+            check_for_redirect(response)
+            book_info = parse_book_page(response)
+            download_image(book_info['Обложка'])
+            download_txt(download_url, f'{book}.{book_info["Заголовок"]}', folder='books/')
+        except requests.HTTPError:
+            pass
