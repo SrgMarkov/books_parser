@@ -1,4 +1,7 @@
 import os
+import sys
+import time
+
 import requests
 import argparse
 from bs4 import BeautifulSoup
@@ -8,12 +11,12 @@ from urllib.parse import urljoin, urlparse
 
 def check_for_redirect(response):
     if response.history:
-        raise requests.HTTPError
+        raise requests.TooManyRedirects
 
 
-def download_txt(url, filename, folder='books/'):
+def download_txt(url, url_params, filename, folder='books/'):
     os.makedirs(folder, exist_ok=True)
-    book_url = requests.get(url)
+    book_url = requests.get(url, params=url_params)
     book_url.raise_for_status()
     check_for_redirect(book_url)
     with open(f"{folder}{sanitize_filename(filename)}.txt", "w") as my_file:
@@ -49,14 +52,14 @@ def parse_book_page(content):
     book_genres = []
     for genre in genres:
         book_genres.append(genre.text)
-    book_info = {
+    book_attributes = {
         'Заголовок': title,
         'Автор': author,
         'Обложка': picture_url,
         'Комментарии': comments_text,
         'Жанр': book_genres
     }
-    return book_info
+    return book_attributes
 
 
 if __name__ == '__main__':
@@ -66,15 +69,21 @@ if __name__ == '__main__':
     command_arguments.add_argument('start_id', help='с какого id начать загрузку', type=int)
     command_arguments.add_argument('end_id', help='на каком id закончить загрузку', type=int)
     args = command_arguments.parse_args()
-    for book in range(args.start_id, args.end_id + 1):
-        url = f'https://tululu.org/b{book}/'
-        download_url = f'https://tululu.org/txt.php?id={book}'
+    for book_id in range(args.start_id, args.end_id + 1):
+        url = f'https://tululu.org/b{book_id}/'
+        download_params = {'id': book_id}
+        download_url = 'https://tululu.org/txt.php'
         response = requests.get(url)
         response.raise_for_status()
         try:
             check_for_redirect(response)
-            book_info = parse_book_page(response)
-            download_image(book_info['Обложка'])
-            download_txt(download_url, f'{book}.{book_info["Заголовок"]}', folder='books/')
-        except requests.HTTPError:
-            pass
+            book_attributes = parse_book_page(response)
+            download_image(book_attributes['Обложка'])
+            download_txt(download_url, download_params, f'{book_id}.{book_info["Заголовок"]}', folder='books/')
+        except requests.TooManyRedirects:
+            print(f'Книга с id{book_id} не доступна для загрузки')
+        except requests.HTTPError as error:
+            print(f'возникла ошибка {error}')
+        except requests.ConnectionError as error:
+            print(f'Ошибка сетевого соединения {error}. Перезапуск парсера через 2 минуты')
+            time.sleep(120)
