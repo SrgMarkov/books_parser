@@ -72,14 +72,14 @@ if __name__ == '__main__':
     for book_id in range(args.start_id, args.end_id + 1):
         url = f'https://tululu.org/b{book_id}/'
         download_params = {'id': book_id}
-        download_url = 'https://tululu.org/txt.php'
+        book_txt_url = 'https://tululu.org/txt.php'
         response = requests.get(url)
         response.raise_for_status()
         try:
             check_for_redirect(response)
             book_attributes = parse_book_page(response)
             download_image(book_attributes['Обложка'])
-            download_txt(download_url, download_params, f'{book_id}.{book_info["Заголовок"]}', folder='books/')
+            download_txt(book_txt_url, download_params, f'{book_id}.{book_attributes["Заголовок"]}', folder='books/')
         except requests.TooManyRedirects:
             print(f'Книга с id{book_id} не доступна для загрузки')
         except requests.HTTPError as error:
