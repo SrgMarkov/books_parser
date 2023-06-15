@@ -1,5 +1,4 @@
 import os
-import sys
 import time
 
 import requests
@@ -16,11 +15,11 @@ def check_for_redirect(response):
 
 def download_txt(url, url_params, filename, folder='books/'):
     os.makedirs(folder, exist_ok=True)
-    book_url = requests.get(url, params=url_params)
-    book_url.raise_for_status()
-    check_for_redirect(book_url)
+    book_text = requests.get(url, params=url_params)
+    book_text.raise_for_status()
+    check_for_redirect(book_text)
     with open(f"{folder}{sanitize_filename(filename)}.txt", "w") as book_txt:
-        book_txt.write(book_url.text)
+        book_txt.write(book_text.text)
     return f"{folder}{sanitize_filename(filename)}.txt"
 
 
@@ -70,16 +69,25 @@ if __name__ == '__main__':
         book_txt_url = 'https://tululu.org/txt.php'
         book_page_response = requests.get(book_url)
         book_page_response.raise_for_status()
-        try:
-            check_for_redirect(book_page_response)
-            book_attributes = parse_book_page(book_page_response, book_url)
-            download_image(book_attributes['cover'])
-            download_txt(book_txt_url, download_params, f'{book_id}.{book_attributes["title"]}', folder='books/')
-        except requests.TooManyRedirects:
-            print(f'Книга с id{book_id} не доступна для загрузки')
-        except requests.HTTPError as error:
-            print(f'возникла ошибка {error}')
-        except requests.ConnectionError as error:
-            print(f'Ошибка сетевого соединения {error}. Перезапуск парсера через 2 минуты')
-            time.sleep(120)
-
+        connection_failure = False
+        while True:
+            try:
+                check_for_redirect(book_page_response)
+                book_attributes = parse_book_page(book_page_response, book_url)
+                download_image(book_attributes['cover'])
+                download_txt(book_txt_url, download_params, f'{book_id}.{book_attributes["title"]}', folder='books/')
+                break
+            except requests.TooManyRedirects:
+                print(f'Книга с id{book_id} не доступна для загрузки')
+                break
+            except requests.HTTPError as error:
+                print(f'возникла ошибка {error}')
+                break
+            except requests.ConnectionError as error:
+                if not connection_failure:
+                    print(f'Ошибка сетевого соединения {error}. Перезапуск парсера')
+                    time.sleep(10)
+                    connection_failure = True
+                else:
+                    print(f'Ошибка сетевого соединения {error}. Перезапуск парсера через 5 минут')
+                    time.sleep(300)
