@@ -19,8 +19,8 @@ def download_txt(url, url_params, filename, folder='books/'):
     book_url = requests.get(url, params=url_params)
     book_url.raise_for_status()
     check_for_redirect(book_url)
-    with open(f"{folder}{sanitize_filename(filename)}.txt", "w") as my_file:
-        my_file.write(book_url.text)
+    with open(f"{folder}{sanitize_filename(filename)}.txt", "w") as book_txt:
+        book_txt.write(book_url.text)
     return f"{folder}{sanitize_filename(filename)}.txt"
 
 
@@ -31,8 +31,8 @@ def download_image(url, folder='images/'):
     picture = requests.get(url)
     picture.raise_for_status()
     check_for_redirect(picture)
-    with open(f"{folder}{picture_name}", "wb") as my_file:
-        my_file.write(picture.content)
+    with open(f"{folder}{picture_name}", "wb") as book_cover:
+        book_cover.write(picture.content)
     return f"{folder}{picture_name}"
 
 
