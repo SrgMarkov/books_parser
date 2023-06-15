@@ -48,11 +48,11 @@ def parse_book_page(content, url):
     genres = soup.find('span', class_='d_book').find_all('a')
     book_genres = [genre.text for genre in genres]
     book_attributes = {
-        'Заголовок': title,
-        'Автор': author,
-        'Обложка': picture_url,
-        'Комментарии': comments_text,
-        'Жанр': book_genres
+        'title': title,
+        'author': author,
+        'cover': picture_url,
+        'comments': comments_text,
+        'genre': book_genres
     }
     return book_attributes
 
@@ -73,8 +73,8 @@ if __name__ == '__main__':
         try:
             check_for_redirect(book_page_response)
             book_attributes = parse_book_page(book_page_response, book_url)
-            download_image(book_attributes['Обложка'])
-            download_txt(book_txt_url, download_params, f'{book_id}.{book_attributes["Заголовок"]}', folder='books/')
+            download_image(book_attributes['cover'])
+            download_txt(book_txt_url, download_params, f'{book_id}.{book_attributes["title"]}', folder='books/')
         except requests.TooManyRedirects:
             print(f'Книга с id{book_id} не доступна для загрузки')
         except requests.HTTPError as error:
