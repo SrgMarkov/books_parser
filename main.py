@@ -20,7 +20,6 @@ def download_txt(url, url_params, filename, folder='books/'):
     check_for_redirect(book_text)
     with open(f"{folder}{sanitize_filename(filename)}.txt", "w") as book_txt:
         book_txt.write(book_text.text)
-    return f"{folder}{sanitize_filename(filename)}.txt"
 
 
 def download_image(url, folder='images/'):
@@ -32,7 +31,6 @@ def download_image(url, folder='images/'):
     check_for_redirect(picture)
     with open(f"{folder}{picture_name}", "wb") as book_cover:
         book_cover.write(picture.content)
-    return f"{folder}{picture_name}"
 
 
 def parse_book_page(content, url):
@@ -67,11 +65,11 @@ if __name__ == '__main__':
         book_url = f'https://tululu.org/b{book_id}/'
         download_params = {'id': book_id}
         book_txt_url = 'https://tululu.org/txt.php'
-        book_page_response = requests.get(book_url)
-        book_page_response.raise_for_status()
         connection_failure = False
         while True:
             try:
+                book_page_response = requests.get(book_url)
+                book_page_response.raise_for_status()
                 check_for_redirect(book_page_response)
                 book_attributes = parse_book_page(book_page_response, book_url)
                 download_image(book_attributes['cover'])
