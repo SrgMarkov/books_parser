@@ -4,7 +4,6 @@ import json
 import requests
 import argparse
 from bs4 import BeautifulSoup
-from pathvalidate import sanitize_filename
 from urllib.parse import urljoin, urlparse
 
 
@@ -18,7 +17,7 @@ def download_txt(url, url_params, filename, folder='books/'):
     book_text = requests.get(url, params=url_params)
     book_text.raise_for_status()
     check_for_redirect(book_text)
-    with open(f"{folder}{sanitize_filename(filename)}.txt", "w") as book_txt:
+    with open(f"{folder}{filename}.txt", "w") as book_txt:
         book_txt.write(book_text.text)
 
 
@@ -26,31 +25,26 @@ def download_image(url, title, folder='images/'):
     os.makedirs(folder, exist_ok=True)
     parsed_url = urlparse(url)
     picture_name = parsed_url.path.split('/')[-1]
-    readable_pictute_name = f'{picture_name.split(".")[0]} - {title}.{picture_name.split(".")[-1]}'
+    readable_picture_name = f'{picture_name.split(".")[0]} - {title}.{picture_name.split(".")[-1]}'
     picture = requests.get(url)
     picture.raise_for_status()
     check_for_redirect(picture)
-    with open(f"{folder}{readable_pictute_name}", "wb") as book_cover:
+    with open(f"{folder}{readable_picture_name}", "wb") as book_cover:
         book_cover.write(picture.content)
 
 
 def parse_book_page(content, url):
     soup = BeautifulSoup(content.text, 'lxml')
-    title_tag = soup.find('h1').text.split('::')
-    picture_tag = soup.find('div', class_='bookimage').find('img')['src']
-    title = title_tag[0].strip()
-    author = title_tag[1].strip()
-    picture_url = urljoin(url, picture_tag)
-    comments = soup.find_all('div', class_="texts")
-    comments_text = [comment.text.split(')')[-1] for comment in comments]
-    genres = soup.find('span', class_='d_book').find_all('a')
-    book_genres = [genre.text for genre in genres]
+    title, author = soup.select('h1')[0].get_text().split(' \xa0 :: \xa0 ')
+    picture_url = urljoin(url, soup.select("div.bookimage a img")[0]['src'])
+    comments = [comment.get_text() for comment in soup.select("div.texts span")]
+    genres = [genre.get_text() for genre in soup.select("span.d_book a")]
     book_attributes = {
         'title': title,
         'author': author,
         'cover': picture_url,
-        'comments': comments_text,
-        'genre': book_genres
+        'comments': comments,
+        'genre': genres
     }
     return book_attributes
 
@@ -80,7 +74,7 @@ if __name__ == '__main__':
                 check_for_redirect(book_page_response)
                 book_attributes = parse_book_page(book_page_response, book_url)
                 download_image(book_attributes['cover'], book_attributes["title"])
-                download_txt(book_txt_url, download_params, f'{book_id}.{book_attributes["title"]}', folder='books/')
+                download_txt(book_txt_url, download_params, f'{book_id} - {book_attributes["title"]}', folder='books/')
                 break
             except requests.TooManyRedirects:
                 print(f'Книга с id{book_id} не доступна для загрузки')
