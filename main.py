@@ -1,6 +1,6 @@
 import os
 import time
-
+import json
 import requests
 import argparse
 from bs4 import BeautifulSoup
@@ -22,14 +22,15 @@ def download_txt(url, url_params, filename, folder='books/'):
         book_txt.write(book_text.text)
 
 
-def download_image(url, folder='images/'):
+def download_image(url, title, folder='images/'):
     os.makedirs(folder, exist_ok=True)
     parsed_url = urlparse(url)
     picture_name = parsed_url.path.split('/')[-1]
+    readable_pictute_name = f'{picture_name.split(".")[0]} - {title}.{picture_name.split(".")[-1]}'
     picture = requests.get(url)
     picture.raise_for_status()
     check_for_redirect(picture)
-    with open(f"{folder}{picture_name}", "wb") as book_cover:
+    with open(f"{folder}{readable_pictute_name}", "wb") as book_cover:
         book_cover.write(picture.content)
 
 
@@ -54,6 +55,12 @@ def parse_book_page(content, url):
     return book_attributes
 
 
+def save_book_description(book_id, attributes, folder='books_description/'):
+    os.makedirs(folder, exist_ok=True)
+    with open(f"{folder}{book_id} - {attributes['title']}.json", "w", encoding='utf8') as json_file:
+        json.dump(attributes, json_file, ensure_ascii=False)
+
+
 if __name__ == '__main__':
     command_arguments = argparse.ArgumentParser(description='скачивание книг с сайта https://tululu.org/ Необходимо '
                                                             'ввести обязательный аргументы - id с какого по какой '
@@ -72,7 +79,7 @@ if __name__ == '__main__':
                 book_page_response.raise_for_status()
                 check_for_redirect(book_page_response)
                 book_attributes = parse_book_page(book_page_response, book_url)
-                download_image(book_attributes['cover'])
+                download_image(book_attributes['cover'], book_attributes["title"])
                 download_txt(book_txt_url, download_params, f'{book_id}.{book_attributes["title"]}', folder='books/')
                 break
             except requests.TooManyRedirects:
