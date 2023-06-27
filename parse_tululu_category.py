@@ -1,36 +1,48 @@
+import argparse
 from urllib.parse import urljoin
 import requests
 from bs4 import BeautifulSoup
 from main import parse_book_page, download_image, download_txt, save_book_description
 
-SITE_URL = 'https://tululu.org'
-BOOK_TEXT_URL = 'https://tululu.org/txt.php'
+
+def get_book_by_category_urls(url, start_page, end_page):
+    books_numbers = []
+    for page in range(start_page, end_page):
+        category_page_url = urljoin(url, f'{page}')
+        books_in_category = get_category_page_soup(category_page_url).select("table.d_book")
+        books_numbers.extend([book.select_one("a")['href'].strip('/').replace('b', '') for book in books_in_category])
+    return books_numbers
 
 
-def get_book_by_category_urls(url):
-    books_pages = []
-    for page in range(1, 2):
-        category = f'/l55/{page}'
-        books_category_url = urljoin(url, category)
-        books_category_response = requests.get(books_category_url)
-        books_category_response.raise_for_status()
-        soup = BeautifulSoup(books_category_response.text, 'lxml')
-        books_in_category = soup.select("table.d_book")
-        books_pages = [book.select_one("a")['href'].strip('/') for book in books_in_category]
-    return books_pages
+def get_category_page_soup(url):
+    books_category_response = requests.get(url)
+    books_category_response.raise_for_status()
+    return BeautifulSoup(books_category_response.text, 'lxml')
 
 
-for book_id in get_book_by_category_urls(SITE_URL):
-    download_params = {'id': book_id.replace('b', '')}
-    book_page_response = requests.get(urljoin(SITE_URL, book_id))
-    book_page_response.raise_for_status()
-    try:
-        book_attributes = parse_book_page(book_page_response, urljoin(SITE_URL, book_id))
-        download_image(book_attributes['cover'], book_attributes['title'])
-        book_id = book_id.replace("b", "")
-        download_txt(BOOK_TEXT_URL, download_params, f'{book_id} - {book_attributes["title"]}',
-                     folder='books/')
-        save_book_description(book_id, book_attributes)
-    except requests.TooManyRedirects:
-        print(f'Книга с id{book_id} не доступна для загрузки')
+if __name__ == '__main__':
+    site_url = 'https://tululu.org/'
+    books_category_number = 'l55/'
+    book_text_url = 'https://tululu.org/txt.php'
+    books_category_url = urljoin(site_url, books_category_number)
+    pages_in_category = get_category_page_soup(books_category_url).select("p.center a")[-1].get_text()
+    command_arguments = argparse.ArgumentParser(description='скачивание книг категории "Научная фантастика "с сайта '
+                                                            'https://tululu.org/ Можно ввести необязательный аргументы '
+                                                            '- номера страниц с какой по какую загружать')
+    command_arguments.add_argument('-s', '--start_page', help='с какой страницы начать загрузку', type=int, default=1)
+    command_arguments.add_argument('-e', '--end_page', help='на какой странице закончить загрузку', type=int,
+                                   default=int(pages_in_category)+1)
+    args = command_arguments.parse_args()
+    for book_id in get_book_by_category_urls(books_category_url, args.start_page, args.end_page):
+        download_params = {'id': book_id}
+        try:
+            book_page_response = requests.get(urljoin(site_url, f'b{book_id}'))
+            book_page_response.raise_for_status()
+            book_attributes = parse_book_page(book_page_response, urljoin(site_url, f'b{book_id}'))
+            download_image(book_attributes['cover'], book_attributes['title'])
+            download_txt(book_text_url, download_params, f'{book_id} - {book_attributes["title"]}',
+                         folder='books/')
+            save_book_description(book_id, book_attributes)
+        except requests.TooManyRedirects:
+            print(f'Книга с id{book_id} не доступна для загрузки')
 
