@@ -61,6 +61,11 @@ if __name__ == '__main__':
                                                             'загружать')
     command_arguments.add_argument('start_id', help='с какого id начать загрузку', type=int)
     command_arguments.add_argument('end_id', help='на каком id закончить загрузку', type=int)
+    command_arguments.add_argument('--dest_folder', help='указать папку для загрузки', default='books')
+    command_arguments.add_argument('--skip_imgs', help='не скачивать обложки книг, необходимо добавить значение True',
+                                   default=False, type=bool)
+    command_arguments.add_argument('--skip_txt', help='не скачивать текст книг, необходимо добавить значение True',
+                                   default=False, type=bool)
     args = command_arguments.parse_args()
     for book_id in range(args.start_id, args.end_id + 1):
         book_url = f'https://tululu.org/b{book_id}/'
@@ -73,8 +78,11 @@ if __name__ == '__main__':
                 book_page_response.raise_for_status()
                 check_for_redirect(book_page_response)
                 book_attributes = parse_book_page(book_page_response, book_url)
-                download_image(book_attributes['cover'], book_attributes["title"])
-                download_txt(book_txt_url, download_params, f'{book_id} - {book_attributes["title"]}', folder='books/')
+                if not args.skip_imgs:
+                    download_image(book_attributes['cover'], book_attributes["title"], args.dest_folder)
+                if not args.skip_txt:
+                    download_txt(book_txt_url, download_params, f'{book_id} - {book_attributes["title"]}',
+                                 args.dest_folder)
                 break
             except requests.TooManyRedirects:
                 print(f'Книга с id{book_id} не доступна для загрузки')

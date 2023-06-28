@@ -7,7 +7,7 @@ from bs4 import BeautifulSoup
 from main import parse_book_page, download_image, download_txt, save_book_description
 
 
-def get_book_by_category_urls(url, start_page, end_page):
+def get_book_id_by_category(url, start_page, end_page):
     books_numbers = []
     for page in range(start_page, end_page):
         category_page_url = urljoin(url, f'{page}')
@@ -40,7 +40,7 @@ if __name__ == '__main__':
                                    default=False, type=bool)
     args = command_arguments.parse_args()
     os.makedirs(args.dest_folder, exist_ok=True)
-    for book_id in get_book_by_category_urls(books_category_url, args.start_page, args.end_page):
+    for book_id in get_book_id_by_category(books_category_url, args.start_page, args.end_page):
         download_params = {'id': book_id}
         connection_failure = False
         while True:
