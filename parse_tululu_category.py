@@ -1,4 +1,6 @@
 import argparse
+import os
+import time
 from urllib.parse import urljoin
 import requests
 from bs4 import BeautifulSoup
@@ -27,22 +29,43 @@ if __name__ == '__main__':
     books_category_url = urljoin(site_url, books_category_number)
     pages_in_category = get_category_page_soup(books_category_url).select("p.center a")[-1].get_text()
     command_arguments = argparse.ArgumentParser(description='скачивание книг категории "Научная фантастика "с сайта '
-                                                            'https://tululu.org/ Можно ввести необязательный аргументы '
-                                                            '- номера страниц с какой по какую загружать')
-    command_arguments.add_argument('-s', '--start_page', help='с какой страницы начать загрузку', type=int, default=1)
-    command_arguments.add_argument('-e', '--end_page', help='на какой странице закончить загрузку', type=int,
+                                                            'https://tululu.org/ Для уточнения аргументов введите -h')
+    command_arguments.add_argument('--start_page', help='с какой страницы начать загрузку', type=int, default=1)
+    command_arguments.add_argument('--end_page', help='на какой странице закончить загрузку', type=int,
                                    default=int(pages_in_category)+1)
+    command_arguments.add_argument('--dest_folder', help='указать папку для загрузки', default='books')
+    command_arguments.add_argument('--skip_imgs', help='не скачивать обложки книг, необходимо добавить значение True',
+                                   default=False, type=bool)
+    command_arguments.add_argument('--skip_txt', help='не скачивать текст книг, необходимо добавить значение True',
+                                   default=False, type=bool)
     args = command_arguments.parse_args()
+    os.makedirs(args.dest_folder, exist_ok=True)
     for book_id in get_book_by_category_urls(books_category_url, args.start_page, args.end_page):
         download_params = {'id': book_id}
-        try:
-            book_page_response = requests.get(urljoin(site_url, f'b{book_id}'))
-            book_page_response.raise_for_status()
-            book_attributes = parse_book_page(book_page_response, urljoin(site_url, f'b{book_id}'))
-            download_image(book_attributes['cover'], book_attributes['title'])
-            download_txt(book_text_url, download_params, f'{book_id} - {book_attributes["title"]}',
-                         folder='books/')
-            save_book_description(book_id, book_attributes)
-        except requests.TooManyRedirects:
-            print(f'Книга с id{book_id} не доступна для загрузки')
-
+        connection_failure = False
+        while True:
+            try:
+                book_page_response = requests.get(urljoin(site_url, f'b{book_id}'))
+                book_page_response.raise_for_status()
+                book_attributes = parse_book_page(book_page_response, urljoin(site_url, f'b{book_id}'))
+                if not args.skip_imgs:
+                    download_image(book_attributes['cover'], book_attributes['title'], args.dest_folder)
+                if not args.skip_txt:
+                    download_txt(book_text_url, download_params, f'{book_id} - {book_attributes["title"]}',
+                                 args.dest_folder)
+                save_book_description(book_id, book_attributes, args.dest_folder)
+                break
+            except requests.TooManyRedirects:
+                print(f'Книга с id{book_id} не доступна для загрузки')
+                break
+            except requests.HTTPError as error:
+                print(f'возникла ошибка {error}')
+                break
+            except requests.ConnectionError as error:
+                if not connection_failure:
+                    print(f'Ошибка сетевого соединения {error}. Перезапуск парсера')
+                    time.sleep(10)
+                    connection_failure = True
+                else:
+                    print(f'Ошибка сетевого соединения {error}. Перезапуск парсера через 5 минут')
+                    time.sleep(300)

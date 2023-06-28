@@ -12,24 +12,24 @@ def check_for_redirect(response):
         raise requests.TooManyRedirects
 
 
-def download_txt(url, url_params, filename, folder='books/'):
-    os.makedirs(folder, exist_ok=True)
+def download_txt(url, url_params, filename, folder):
+    os.makedirs(f'{folder}/books_txt', exist_ok=True)
     book_text = requests.get(url, params=url_params)
     book_text.raise_for_status()
     check_for_redirect(book_text)
-    with open(f"{folder}{filename}.txt", "w") as book_txt:
+    with open(f"{folder}/books_txt/{filename}.txt", "w") as book_txt:
         book_txt.write(book_text.text)
 
 
-def download_image(url, title, folder='images/'):
-    os.makedirs(folder, exist_ok=True)
+def download_image(url, title, folder):
+    os.makedirs(f'{folder}/books_covers', exist_ok=True)
     parsed_url = urlparse(url)
     picture_name = parsed_url.path.split('/')[-1]
     readable_picture_name = f'{picture_name.split(".")[0]} - {title}.{picture_name.split(".")[-1]}'
     picture = requests.get(url)
     picture.raise_for_status()
     check_for_redirect(picture)
-    with open(f"{folder}{readable_picture_name}", "wb") as book_cover:
+    with open(f"{folder}/books_covers/{readable_picture_name}", "wb") as book_cover:
         book_cover.write(picture.content)
 
 
@@ -49,9 +49,9 @@ def parse_book_page(content, url):
     return book_attributes
 
 
-def save_book_description(book_id, attributes, folder='books_description/'):
-    os.makedirs(folder, exist_ok=True)
-    with open(f"{folder}{book_id} - {attributes['title']}.json", "w", encoding='utf8') as json_file:
+def save_book_description(book_id, attributes, folder):
+    os.makedirs(f'{folder}/books_description', exist_ok=True)
+    with open(f"{folder}/books_description/{book_id} - {attributes['title']}.json", "w", encoding='utf8') as json_file:
         json.dump(attributes, json_file, ensure_ascii=False)
 
 
