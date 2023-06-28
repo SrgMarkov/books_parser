@@ -43,12 +43,12 @@ if __name__ == '__main__':
     books_category_number = 'l55/'
     book_text_url = 'https://tululu.org/txt.php'
     books_category_url = urljoin(site_url, books_category_number)
-    pages_in_category = get_category_page_soup(books_category_url).select("p.center a")[-1].get_text()
+    last_page_in_category = get_category_page_soup(books_category_url).select("p.center a")[-1].get_text()
     command_arguments = argparse.ArgumentParser(description='скачивание книг категории "Научная фантастика "с сайта '
                                                             'https://tululu.org/ Для уточнения аргументов введите -h')
     command_arguments.add_argument('--start_page', help='с какой страницы начать загрузку', type=int, default=1)
     command_arguments.add_argument('--end_page', help='на какой странице закончить загрузку', type=int,
-                                   default=int(pages_in_category)+1)
+                                   default=int(last_page_in_category) + 1)
     command_arguments.add_argument('--dest_folder', help='указать папку для загрузки', default='books')
     command_arguments.add_argument('--skip_imgs', help='не скачивать обложки книг, необходимо добавить значение True',
                                    default=False, type=bool)
