@@ -5,7 +5,7 @@ import time
 from urllib.parse import urljoin
 import requests
 from bs4 import BeautifulSoup
-from main import parse_book_page, download_image, download_txt, save_book_description
+from main import parse_book_page, download_image, download_txt
 
 
 def get_books_id_by_category(url, start_page, end_page):
@@ -51,10 +51,10 @@ if __name__ == '__main__':
     command_arguments.add_argument('--end_page', help='на какой странице закончить загрузку', type=int,
                                    default=int(last_page_in_category) + 1)
     command_arguments.add_argument('--dest_folder', help='указать папку для загрузки', default='books')
-    command_arguments.add_argument('--skip_imgs', help='не скачивать обложки книг, необходимо добавить значение True',
-                                   default=False, type=bool)
-    command_arguments.add_argument('--skip_txt', help='не скачивать текст книг, необходимо добавить значение True',
-                                   default=False, type=bool)
+    command_arguments.add_argument('--skip_imgs', help='не скачивать обложки книг',
+                                   default=False, action='store_const', const=True)
+    command_arguments.add_argument('--skip_txt', help='не скачивать текст книг',
+                                   default=False, action='store_const', const=True)
     args = command_arguments.parse_args()
     os.makedirs(args.dest_folder, exist_ok=True)
     for book_id in get_books_id_by_category(books_category_url, args.start_page, args.end_page):

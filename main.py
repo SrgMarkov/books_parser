@@ -55,10 +55,10 @@ if __name__ == '__main__':
     command_arguments.add_argument('start_id', help='с какого id начать загрузку', type=int)
     command_arguments.add_argument('end_id', help='на каком id закончить загрузку', type=int)
     command_arguments.add_argument('--dest_folder', help='указать папку для загрузки', default='books')
-    command_arguments.add_argument('--skip_imgs', help='не скачивать обложки книг, необходимо добавить значение True',
-                                   default=False, type=bool)
-    command_arguments.add_argument('--skip_txt', help='не скачивать текст книг, необходимо добавить значение True',
-                                   default=False, type=bool)
+    command_arguments.add_argument('--skip_imgs', help='не скачивать обложки книг',
+                                   default=False, action='store_const', const=True)
+    command_arguments.add_argument('--skip_txt', help='не скачивать текст книг',
+                                   default=False, action='store_const', const=True)
     args = command_arguments.parse_args()
     for book_id in range(args.start_id, args.end_id + 1):
         book_url = f'https://tululu.org/b{book_id}/'
