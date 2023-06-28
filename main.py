@@ -1,6 +1,5 @@
 import os
 import time
-import json
 import requests
 import argparse
 from bs4 import BeautifulSoup
@@ -47,12 +46,6 @@ def parse_book_page(content, url):
         'genre': genres
     }
     return book_attributes
-
-
-def save_book_description(book_id, attributes, folder):
-    os.makedirs(f'{folder}/books_description', exist_ok=True)
-    with open(f"{folder}/books_description/{book_id} - {attributes['title']}.json", "w", encoding='utf8') as json_file:
-        json.dump(attributes, json_file, ensure_ascii=False)
 
 
 if __name__ == '__main__':

@@ -1,4 +1,5 @@
 import argparse
+import json
 import os
 import time
 from urllib.parse import urljoin
@@ -69,7 +70,9 @@ if __name__ == '__main__':
                 if not args.skip_txt:
                     download_txt(book_text_url, download_params, f'{book_id} - {book_attributes["title"]}',
                                  args.dest_folder)
-                save_book_description(book_id, book_attributes, args.dest_folder)
+                with open(f"{args.dest_folder}/books_description.json", "a", newline='\r\n',
+                          encoding='utf8') as json_file:
+                    json.dump(book_attributes, json_file, ensure_ascii=False, indent=4)
                 break
             except requests.TooManyRedirects:
                 print(f'Книга с id{book_id} не доступна для загрузки')
