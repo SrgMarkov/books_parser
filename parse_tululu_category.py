@@ -10,9 +10,25 @@ from main import parse_book_page, download_image, download_txt, save_book_descri
 def get_book_id_by_category(url, start_page, end_page):
     books_numbers = []
     for page in range(start_page, end_page):
-        category_page_url = urljoin(url, f'{page}')
-        books_in_category = get_category_page_soup(category_page_url).select("table.d_book")
-        books_numbers.extend([book.select_one("a")['href'].strip('/').replace('b', '') for book in books_in_category])
+        connection_lost = False
+        while True:
+            try:
+                category_page_url = urljoin(url, f'{page}')
+                books_in_category = get_category_page_soup(category_page_url).select("table.d_book")
+                books_numbers.extend([book.select_one("a")['href'].strip('/').replace('b', '')
+                                      for book in books_in_category])
+                break
+            except requests.HTTPError as error:
+                print(f'возникла ошибка {error}')
+                break
+            except requests.ConnectionError as error:
+                if not connection_lost:
+                    print(f'Ошибка сетевого соединения {error}. Перезапуск парсера')
+                    time.sleep(10)
+                    connection_lost = True
+                else:
+                    print(f'Ошибка сетевого соединения {error}. Перезапуск парсера через 5 минут')
+                    time.sleep(300)
     return books_numbers
 
 
