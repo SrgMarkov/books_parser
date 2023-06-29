@@ -39,6 +39,12 @@ def get_category_page_soup(url):
     return BeautifulSoup(books_category_response.text, 'lxml')
 
 
+def save_book_attributes(attributes):
+    with open(f"{args.dest_folder}/books_description.json", "a", newline='\r\n',
+              encoding='utf8') as json_file:
+        json.dump(attributes, json_file, ensure_ascii=False, indent=4)
+
+
 if __name__ == '__main__':
     site_url = 'https://tululu.org/'
     books_category_number = 'l55/'
@@ -70,9 +76,7 @@ if __name__ == '__main__':
                 if not args.skip_txt:
                     download_txt(book_text_url, download_params, f'{book_id} - {book_attributes["title"]}',
                                  args.dest_folder)
-                with open(f"{args.dest_folder}/books_description.json", "a", newline='\r\n',
-                          encoding='utf8') as json_file:
-                    json.dump(book_attributes, json_file, ensure_ascii=False, indent=4)
+                save_book_attributes(book_attributes)
                 break
             except requests.TooManyRedirects:
                 print(f'Книга с id{book_id} не доступна для загрузки')
