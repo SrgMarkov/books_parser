@@ -39,12 +39,6 @@ def get_category_page_soup(url):
     return BeautifulSoup(books_category_response.text, 'lxml')
 
 
-def save_book_attributes(attributes):
-    with open(f"{args.dest_folder}/books_description.json", "a", newline='\r\n',
-              encoding='utf8') as json_file:
-        json.dump(attributes, json_file, ensure_ascii=False, indent=4)
-
-
 if __name__ == '__main__':
     site_url = 'https://tululu.org/'
     books_category_number = 'l55/'
@@ -63,6 +57,7 @@ if __name__ == '__main__':
                                    default=False, action='store_true')
     args = command_arguments.parse_args()
     os.makedirs(args.dest_folder, exist_ok=True)
+    books_attributes = []
     for book_id in get_books_id_by_category(books_category_url, args.start_page, args.end_page):
         download_params = {'id': book_id}
         connection_failure = False
@@ -76,7 +71,7 @@ if __name__ == '__main__':
                 if not args.skip_txt:
                     download_txt(book_text_url, download_params, f'{book_id} - {book_attributes["title"]}',
                                  args.dest_folder)
-                save_book_attributes(book_attributes)
+                books_attributes.append(book_attributes)
                 break
             except requests.TooManyRedirects:
                 print(f'Книга с id{book_id} не доступна для загрузки')
@@ -92,3 +87,6 @@ if __name__ == '__main__':
                 else:
                     print(f'Ошибка сетевого соединения {error}. Перезапуск парсера через 5 минут')
                     time.sleep(300)
+    with open(f"{args.dest_folder}/books_description.json", "a", newline='\r\n',
+              encoding='utf8') as json_file:
+        json.dump(books_attributes, json_file, ensure_ascii=False, indent=4)
