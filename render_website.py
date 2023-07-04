@@ -1,6 +1,7 @@
 import json
 from jinja2 import Environment, FileSystemLoader, select_autoescape
-from livereload import Server, shell
+from livereload import Server
+from more_itertools import chunked
 
 
 def on_reload():
@@ -25,8 +26,9 @@ def on_reload():
             'cover': f'./books/books_covers/{cover}'
         }
         books_attributes.append(attribute)
+    chunked_books_attributes = list(chunked(books_attributes, 2))
 
-    rendered_page = template.render(books=books_attributes)
+    rendered_page = template.render(books=chunked_books_attributes)
 
     with open('index.html', 'w', encoding="utf8") as file:
         file.write(rendered_page)
