@@ -20,10 +20,12 @@ def on_reload():
     books_attributes = []
     for book in books_descriptions:
         cover = book['cover'].split('/')[-1]
+        book_file = f'{cover.split(".")[0]}.txt'
         attribute = {
             'title': book['title'],
             'author': book['author'],
-            'cover': f'./books/books_covers/{cover}'
+            'cover': f'./books/books_covers/{cover}',
+            'text': f'./books/books_txt/{book_file}'
         }
         books_attributes.append(attribute)
     chunked_books_attributes = list(chunked(books_attributes, 2))
