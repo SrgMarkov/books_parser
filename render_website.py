@@ -1,33 +1,40 @@
 import json
-from http.server import HTTPServer, SimpleHTTPRequestHandler
 from jinja2 import Environment, FileSystemLoader, select_autoescape
+from livereload import Server, shell
 
-env = Environment(
-    loader=FileSystemLoader('.'),
-    autoescape=select_autoescape(['html', 'xml'])
-)
 
-template = env.get_template('template.html')
+def on_reload():
+    env = Environment(
+        loader=FileSystemLoader('.'),
+        autoescape=select_autoescape(['html', 'xml'])
+    )
 
-with open("books/books_description.json", "r") as descriptions_file:
-    descriptions = descriptions_file.read()
+    template = env.get_template('template.html')
 
-books_descriptions = json.loads(descriptions)
+    with open("books/books_description.json", "r") as descriptions_file:
+        descriptions = descriptions_file.read()
 
-books_attributes = []
-for book in books_descriptions:
-    cover = book['cover'].split('/')[-1]
-    attribute = {
-        'title': book['title'],
-        'author': book['author'],
-        'cover': f'./books/books_covers/{cover}'
-    }
-    books_attributes.append(attribute)
+    books_descriptions = json.loads(descriptions)
 
-rendered_page = template.render(books=books_attributes)
+    books_attributes = []
+    for book in books_descriptions:
+        cover = book['cover'].split('/')[-1]
+        attribute = {
+            'title': book['title'],
+            'author': book['author'],
+            'cover': f'./books/books_covers/{cover}'
+        }
+        books_attributes.append(attribute)
 
-with open('index.html', 'w', encoding="utf8") as file:
-    file.write(rendered_page)
+    rendered_page = template.render(books=books_attributes)
 
-server = HTTPServer(('0.0.0.0', 8000), SimpleHTTPRequestHandler)
-server.serve_forever()
+    with open('index.html', 'w', encoding="utf8") as file:
+        file.write(rendered_page)
+
+    print("Site rebuilt")
+
+
+on_reload()
+server = Server()
+server.watch('template.html', on_reload)
+server.serve(root='.')
