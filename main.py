@@ -24,7 +24,7 @@ def download_image(url, title, folder):
     os.makedirs(f'{folder}/books_covers', exist_ok=True)
     parsed_url = urlparse(url)
     picture_name = parsed_url.path.split('/')[-1]
-    readable_picture_name = f'{picture_name.split(".")[0]} - {title}.{picture_name.split(".")[-1]}'
+    readable_picture_name = f'{picture_name.split(".")[0]}.{picture_name.split(".")[-1]}'
     picture = requests.get(url)
     picture.raise_for_status()
     check_for_redirect(picture)
@@ -74,7 +74,7 @@ if __name__ == '__main__':
                 if not args.skip_imgs:
                     download_image(book_attributes['cover'], book_attributes["title"], args.dest_folder)
                 if not args.skip_txt:
-                    download_txt(book_txt_url, download_params, f'{book_id} - {book_attributes["title"]}',
+                    download_txt(book_txt_url, download_params, book_id,
                                  args.dest_folder)
                 break
             except requests.TooManyRedirects:

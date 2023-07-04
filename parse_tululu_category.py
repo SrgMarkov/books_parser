@@ -69,8 +69,7 @@ if __name__ == '__main__':
                 if not args.skip_imgs:
                     download_image(book_attributes['cover'], book_attributes['title'], args.dest_folder)
                 if not args.skip_txt:
-                    download_txt(book_text_url, download_params, f'{book_id} - {book_attributes["title"]}',
-                                 args.dest_folder)
+                    download_txt(book_text_url, download_params, book_id, args.dest_folder)
                 books_attributes.append(book_attributes)
                 break
             except requests.TooManyRedirects:
