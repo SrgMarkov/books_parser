@@ -11,6 +11,21 @@
     <title>Offline Library</title>
   </head>
   <body>
+    <nav aria-label="Page navigation" class="container">
+      <ul class="pagination">
+        <li class="page-item{% if current_page == 1 %} disabled{% endif %}">
+          <a class="page-link" href="./index_{{current_page - 1}}.html" tabindex="-1" aria-disabled="true">Назад</a>
+        </li>
+        {% for page in range(1, amount + 1) %}
+          <li class="page-item{% if page == current_page %} active{% endif %}">
+            <a class="page-link" href="./index_{{page}}.html">{{page}}</a>
+          </li>
+        {% endfor %}
+        <li class="page-item{% if current_page == amount %} disabled{% endif %}">
+          <a class="page-link" href="./index_{{current_page + 1}}.html">Вперёд</a>
+        </li>
+      </ul>
+    </nav>
     {% for first_book, second_book in books %}
       <div class="container">
         <div class="row">

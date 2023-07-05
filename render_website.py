@@ -1,3 +1,4 @@
+import math
 import os
 import json
 from jinja2 import Environment, FileSystemLoader, select_autoescape
@@ -17,9 +18,10 @@ def on_reload():
         descriptions = descriptions_file.read()
 
     books_descriptions = json.loads(descriptions)
-
-    books_pages = list(chunked(books_descriptions, 10))
-    for count, books in enumerate(books_pages):
+    pages = list(chunked(books_descriptions, 10))
+    pages_amount = math.ceil(len(books_descriptions) / len(pages))
+    current_page = []
+    for page, books in enumerate(pages):
         books_attributes = []
         for book in books:
             cover = book['cover'].split('/')[-1]
@@ -28,13 +30,13 @@ def on_reload():
                 'title': book['title'],
                 'author': book['author'],
                 'cover': f'../books/books_covers/{cover}',
-                'text': f'../books/books_txt/{book_file}'
+                'text': f'../books/books_txt/{book_file}',
             }
             books_attributes.append(attribute)
         chunked_books_attributes = list(chunked(books_attributes, 2))
-        rendered_page = template.render(books=chunked_books_attributes)
+        rendered_page = template.render(books=chunked_books_attributes, amount=pages_amount, current_page=page + 1)
 
-        with open(f'pages/index_{count + 1}.html', 'w', encoding="utf8") as file:
+        with open(f'pages/index_{page + 1}.html', 'w', encoding="utf8") as file:
             file.write(rendered_page)
 
     print("Site rebuilt")
