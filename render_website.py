@@ -31,6 +31,7 @@ def on_reload():
                 'author': book['author'],
                 'cover': f'../books/books_covers/{cover}',
                 'text': f'../books/books_txt/{book_file}',
+                'genre': book['genre']
             }
             books_attributes.append(attribute)
         chunked_books_attributes = list(chunked(books_attributes, 2))
