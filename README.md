@@ -58,3 +58,13 @@ python3 parse_tululu_category.py --start_page 10 --end_page 15
 **save_book_description** - скачивает json файл с описанием книги
 
 **get_book_id_by_category** - получает список id книг в необходимой категории
+
+### Просмотр книг
+
+После загрузки книг можно перейти в режим просмотра, для этого запустите команду
+```
+python3 render_website.py
+```
+и откройте файл `index_1.html` в папке pages
+
+Пример рабочего сайта можно посмотреть на [Github Pages](https://srgmarkov.github.io/books_parser/pages/index_1.html)
