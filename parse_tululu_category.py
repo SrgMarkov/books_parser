@@ -50,7 +50,7 @@ if __name__ == '__main__':
     command_arguments.add_argument('--start_page', help='с какой страницы начать загрузку', type=int, default=1)
     command_arguments.add_argument('--end_page', help='на какой странице закончить загрузку', type=int,
                                    default=int(last_page_in_category) + 1)
-    command_arguments.add_argument('--dest_folder', help='указать папку для загрузки', default='books')
+    command_arguments.add_argument('--dest_folder', help='указать папку для загрузки', default='media')
     command_arguments.add_argument('--skip_imgs', help='не скачивать обложки книг',
                                    default=False, action='store_true')
     command_arguments.add_argument('--skip_txt', help='не скачивать текст книг',

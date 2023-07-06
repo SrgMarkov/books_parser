@@ -14,7 +14,7 @@ def on_reload():
 
     template = env.get_template('template.html')
     os.makedirs('pages', exist_ok=True)
-    with open("books/books_description.json", "r") as descriptions_file:
+    with open("media/books_description.json", "r") as descriptions_file:
         descriptions = descriptions_file.read()
 
     books_descriptions = json.loads(descriptions)
@@ -29,8 +29,8 @@ def on_reload():
             attribute = {
                 'title': book['title'],
                 'author': book['author'],
-                'cover': f'../books/books_covers/{cover}',
-                'text': f'../books/books_txt/{book_file}',
+                'cover': f'../media/books_covers/{cover}',
+                'text': f'../media/books_txt/{book_file}',
                 'genre': book['genre']
             }
             books_attributes.append(attribute)

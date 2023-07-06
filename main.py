@@ -54,7 +54,7 @@ if __name__ == '__main__':
                                                             'загружать')
     command_arguments.add_argument('start_id', help='с какого id начать загрузку', type=int)
     command_arguments.add_argument('end_id', help='на каком id закончить загрузку', type=int)
-    command_arguments.add_argument('--dest_folder', help='указать папку для загрузки', default='books')
+    command_arguments.add_argument('--dest_folder', help='указать папку для загрузки', default='media')
     command_arguments.add_argument('--skip_imgs', help='не скачивать обложки книг',
                                    default=False, action='store_true')
     command_arguments.add_argument('--skip_txt', help='не скачивать текст книг',
