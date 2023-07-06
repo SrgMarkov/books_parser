@@ -4,6 +4,7 @@ import json
 from jinja2 import Environment, FileSystemLoader, select_autoescape
 from livereload import Server
 from more_itertools import chunked
+from dotenv import load_dotenv
 
 
 def on_reload():
@@ -11,16 +12,17 @@ def on_reload():
         loader=FileSystemLoader('.'),
         autoescape=select_autoescape(['html', 'xml'])
     )
-
+    load_dotenv()
+    description_folder = os.getenv('FOLDER')
     template = env.get_template('template.html')
     os.makedirs('pages', exist_ok=True)
-    with open("media/books_description.json", "r") as descriptions_file:
+
+    with open(f"{description_folder}/books_description.json", "r") as descriptions_file:
         descriptions = descriptions_file.read()
 
     books_descriptions = json.loads(descriptions)
     pages = list(chunked(books_descriptions, 10))
     pages_amount = math.ceil(len(books_descriptions) / len(pages))
-    current_page = []
     for page, books in enumerate(pages):
         books_attributes = []
         for book in books:
