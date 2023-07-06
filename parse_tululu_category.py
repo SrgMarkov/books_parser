@@ -86,6 +86,6 @@ if __name__ == '__main__':
                 else:
                     print(f'Ошибка сетевого соединения {error}. Перезапуск парсера через 5 минут')
                     time.sleep(300)
-    with open(f"{args.dest_folder}/books_description.json", "a", newline='\r\n',
+    with open(f'{args.dest_folder}/books_description.json', 'a', newline='\r\n',
               encoding='utf8') as json_file:
         json.dump(books_attributes, json_file, ensure_ascii=False, indent=4)

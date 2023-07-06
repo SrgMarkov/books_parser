@@ -18,9 +18,8 @@ def on_reload():
     os.makedirs('pages', exist_ok=True)
 
     with open(f"{description_folder}/books_description.json", "r") as descriptions_file:
-        descriptions = descriptions_file.read()
+        books_descriptions = json.load(descriptions_file)
 
-    books_descriptions = json.loads(descriptions)
     pages = list(chunked(books_descriptions, 10))
     pages_amount = math.ceil(len(books_descriptions) / len(pages))
     for page, books in enumerate(pages):
