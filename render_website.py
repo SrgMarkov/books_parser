@@ -26,7 +26,7 @@ def on_reload():
 
     pages = list(chunked(books_descriptions, BOOKS_IN_PAGE))
     pages_amount = math.ceil(len(books_descriptions) / len(pages))
-    for page, books in enumerate(pages):
+    for page, books in enumerate(pages, start=1):
         books_attributes = []
         for book in books:
             cover = book['cover'].split('/')[-1]
@@ -40,7 +40,7 @@ def on_reload():
             }
             books_attributes.append(attribute)
         chunked_books_attributes = list(chunked(books_attributes, BOOKS_COLUMNS))
-        rendered_page = template.render(books=chunked_books_attributes, amount=pages_amount, current_page=page + 1)
+        rendered_page = template.render(books=chunked_books_attributes, amount=pages_amount, current_page=page)
 
         with open(f'pages/index_{page + 1}.html', 'w', encoding="utf8") as file:
             file.write(rendered_page)
