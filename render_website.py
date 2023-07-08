@@ -7,6 +7,10 @@ from more_itertools import chunked
 from dotenv import load_dotenv
 
 
+BOOKS_IN_PAGE = 10
+BOOKS_COLUMNS = 2
+
+
 def on_reload():
     env = Environment(
         loader=FileSystemLoader('.'),
@@ -20,7 +24,7 @@ def on_reload():
     with open(f"{description_folder}/books_description.json", "r") as descriptions_file:
         books_descriptions = json.load(descriptions_file)
 
-    pages = list(chunked(books_descriptions, 10))
+    pages = list(chunked(books_descriptions, BOOKS_IN_PAGE))
     pages_amount = math.ceil(len(books_descriptions) / len(pages))
     for page, books in enumerate(pages):
         books_attributes = []
@@ -35,7 +39,7 @@ def on_reload():
                 'genre': book['genre']
             }
             books_attributes.append(attribute)
-        chunked_books_attributes = list(chunked(books_attributes, 2))
+        chunked_books_attributes = list(chunked(books_attributes, BOOKS_COLUMNS))
         rendered_page = template.render(books=chunked_books_attributes, amount=pages_amount, current_page=page + 1)
 
         with open(f'pages/index_{page + 1}.html', 'w', encoding="utf8") as file:
