@@ -42,10 +42,8 @@ def on_reload():
         chunked_books_attributes = list(chunked(books_attributes, BOOKS_COLUMNS))
         rendered_page = template.render(books=chunked_books_attributes, amount=pages_amount, current_page=page)
 
-        with open(f'pages/index_{page + 1}.html', 'w', encoding="utf8") as file:
+        with open(f'pages/index_{page}.html', 'w', encoding="utf8") as file:
             file.write(rendered_page)
-
-    print("Site rebuilt")
 
 
 on_reload()
