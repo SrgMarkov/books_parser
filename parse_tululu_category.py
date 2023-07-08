@@ -15,8 +15,8 @@ def get_books_id_by_category(url, start_page, end_page):
         while True:
             try:
                 category_page_url = urljoin(url, f'{page}')
-                books_in_category = get_category_page_soup(category_page_url).select("table.d_book")
-                books_numbers.extend([book.select_one("a")['href'].strip('/').replace('b', '')
+                books_in_category = get_category_page_soup(category_page_url).select('table.d_book')
+                books_numbers.extend([book.select_one('a')['href'].strip('/').replace('b', '')
                                       for book in books_in_category])
                 break
             except requests.HTTPError as error:

@@ -16,7 +16,7 @@ def download_txt(url, url_params, filename, folder):
     book_text = requests.get(url, params=url_params)
     book_text.raise_for_status()
     check_for_redirect(book_text)
-    with open(f"{folder}/books_txt/{filename}.txt", "w") as book_txt:
+    with open(f'{folder}/books_txt/{filename}.txt', 'w') as book_txt:
         book_txt.write(book_text.text)
 
 
@@ -28,16 +28,16 @@ def download_image(url, title, folder):
     picture = requests.get(url)
     picture.raise_for_status()
     check_for_redirect(picture)
-    with open(f"{folder}/books_covers/{readable_picture_name}", "wb") as book_cover:
+    with open(f'{folder}/books_covers/{readable_picture_name}', 'wb') as book_cover:
         book_cover.write(picture.content)
 
 
 def parse_book_page(content, url):
     soup = BeautifulSoup(content.text, 'lxml')
     title, author = soup.select('h1')[0].get_text().split(' \xa0 :: \xa0 ')
-    picture_url = urljoin(url, soup.select("div.bookimage a img")[0]['src'])
-    comments = [comment.get_text() for comment in soup.select("div.texts span")]
-    genres = [genre.get_text() for genre in soup.select("span.d_book a")]
+    picture_url = urljoin(url, soup.select('div.bookimage a img')[0]['src'])
+    comments = [comment.get_text() for comment in soup.select('div.texts span')]
+    genres = [genre.get_text() for genre in soup.select('span.d_book a')]
     book_attributes = {
         'title': title,
         'author': author,
@@ -72,7 +72,7 @@ if __name__ == '__main__':
                 check_for_redirect(book_page_response)
                 book_attributes = parse_book_page(book_page_response, book_url)
                 if not args.skip_imgs:
-                    download_image(book_attributes['cover'], book_attributes["title"], args.dest_folder)
+                    download_image(book_attributes['cover'], book_attributes['title'], args.dest_folder)
                 if not args.skip_txt:
                     download_txt(book_txt_url, download_params, book_id,
                                  args.dest_folder)

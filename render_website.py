@@ -21,7 +21,7 @@ def on_reload():
     template = env.get_template('template.html')
     os.makedirs('pages', exist_ok=True)
 
-    with open(f"{description_folder}/books_description.json", "r") as descriptions_file:
+    with open(f'{description_folder}/books_description.json', 'r') as descriptions_file:
         books_descriptions = json.load(descriptions_file)
 
     pages = list(chunked(books_descriptions, BOOKS_IN_PAGE))
@@ -42,7 +42,7 @@ def on_reload():
         chunked_books_attributes = list(chunked(books_attributes, BOOKS_COLUMNS))
         rendered_page = template.render(books=chunked_books_attributes, amount=pages_amount, current_page=page)
 
-        with open(f'pages/index_{page}.html', 'w', encoding="utf8") as file:
+        with open(f'pages/index_{page}.html', 'w', encoding='utf8') as file:
             file.write(rendered_page)
 
 
