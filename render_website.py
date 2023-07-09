@@ -5,6 +5,7 @@ from jinja2 import Environment, FileSystemLoader, select_autoescape
 from livereload import Server
 from more_itertools import chunked
 from dotenv import load_dotenv
+from urllib.parse import quote
 
 
 BOOKS_IN_PAGE = 10
@@ -34,8 +35,8 @@ def on_reload():
             attribute = {
                 'title': book['title'],
                 'author': book['author'],
-                'cover': f'../media/books_covers/{cover}',
-                'text': f'../media/books_txt/{book_file}',
+                'cover': quote(f'../media/books_covers/{cover}'),
+                'text': quote(f'../media/books_txt/{book_file}'),
                 'genre': book['genre']
             }
             books_attributes.append(attribute)
