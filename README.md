@@ -65,6 +65,9 @@ python3 parse_tululu_category.py --start_page 10 --end_page 15
 ```
 python3 render_website.py
 ```
-и откройте файл `index_1.html` в папке pages
+По умолчанию файл с описаниями книг должен находиться в папке `data`, однако к нему можно указать свой пусть при помощи переменных окружения.
+Для этого создайте рядом с `render_website.py` файл `.env` и пропишите в нем `FOLDER=Путь_до_файла`
 
-Пример рабочего сайта можно посмотреть на [Github Pages](https://srgmarkov.github.io/books_parser/pages/index_1.html)
+Для просмотра - откройте в браузере файл `index_1.html` в папке pages или перейдите по [cсылке](http://127.0.0.1:5500) 
+
+Пример рабочего сайта можно посмотреть на [по данной ссылке на Github Pages](https://srgmarkov.github.io/books_parser/pages/index_1.html)

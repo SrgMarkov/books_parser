@@ -18,7 +18,7 @@ def on_reload():
         autoescape=select_autoescape(['html', 'xml'])
     )
     load_dotenv()
-    description_folder = os.getenv('FOLDER')
+    description_folder = os.getenv('FOLDER', default='data')
     template = env.get_template('template.html')
     os.makedirs('pages', exist_ok=True)
 
