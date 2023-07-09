@@ -31,7 +31,7 @@ def on_reload():
         books_attributes = []
         for book in books:
             cover = book['cover'].split('/')[-1]
-            book_file = f'{cover.split(".")[0]}.txt'
+            book_file = f'{book["id"]}.txt'
             attribute = {
                 'title': book['title'],
                 'author': book['author'],
