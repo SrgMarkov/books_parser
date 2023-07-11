@@ -61,13 +61,20 @@ python3 parse_tululu_category.py --start_page 10 --end_page 15
 
 ### Просмотр книг
 
-После загрузки книг можно перейти в режим просмотра, для этого запустите команду
+#### Файл с описанием
+Необходимо указать путь к файлу с описанием книг. Для этого создайте рядом с `render_website.py` файл `.env` и пропишите путь:
+```
+DESCRIPTION_FILE=/Users/ExampleUser/Downloads/books_description.json
+```
+По умолчанию установлен файл `data/books_description.json`
+
+#### Запуск сайта
+
+Для создания страниц с книгами запустите команду
 ```
 python3 render_website.py
 ```
-По умолчанию файл с описаниями книг должен находиться в папке `data`, однако к нему можно указать свой пусть при помощи переменных окружения.
-Для этого создайте рядом с `render_website.py` файл `.env` и пропишите в нем `FOLDER=Путь_до_файла`
 
-Для просмотра - откройте в браузере файл `index_1.html` в папке pages или перейдите по [cсылке](http://127.0.0.1:5500) 
+Для просмотра - откройте в браузере файл `index_1.html` в папке pages или перейдите по [cсылке](http://localhost:63342/books_parser/pages/index_1.html) 
 
-Пример рабочего сайта можно посмотреть на [по данной ссылке на Github Pages](https://srgmarkov.github.io/books_parser/pages/index_1.html)
+Пример рабочего сайта можно посмотреть [по данной ссылке на Github Pages](https://srgmarkov.github.io/books_parser/pages/index_1.html)

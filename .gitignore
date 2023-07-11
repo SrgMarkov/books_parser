@@ -1,5 +1,5 @@
 /.idea/
 __pycache__/main.cpython-311.pyc
 .DS_Store
-/.env
+/static/.env
 .DS_Store

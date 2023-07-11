@@ -12,17 +12,15 @@ BOOKS_IN_PAGE = 10
 BOOKS_COLUMNS = 2
 
 
-def on_reload():
+def on_reload(json_file):
     env = Environment(
         loader=FileSystemLoader('.'),
         autoescape=select_autoescape(['html', 'xml'])
     )
-    load_dotenv()
-    description_folder = os.getenv('FOLDER', default='data')
     template = env.get_template('template.html')
     os.makedirs('pages', exist_ok=True)
 
-    with open(f'{description_folder}/books_description.json', 'r') as descriptions_file:
+    with open(json_file, 'r') as descriptions_file:
         books_descriptions = json.load(descriptions_file)
 
     pages = list(chunked(books_descriptions, BOOKS_IN_PAGE))
@@ -48,9 +46,11 @@ def on_reload():
 
 
 def main():
-    on_reload()
+    load_dotenv()
+    books_description = os.getenv('DESCRIPTION_FILE', default='data/books_description.json')
+    on_reload(books_description)
     server = Server()
-    server.watch('template.html', on_reload)
+    server.watch('template.html', on_reload(books_description))
     server.serve(root='.')
 
 
