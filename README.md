@@ -75,6 +75,6 @@ DESCRIPTION_FILE=/Users/ExampleUser/Downloads/books_description.json
 python3 render_website.py
 ```
 
-Для просмотра - откройте в браузере файл `index_1.html` в папке pages или перейдите по [cсылке](http://localhost:63342/books_parser/pages/index_1.html) 
+Для просмотра - откройте в браузере файл `index_1.html` в папке pages или перейдите по [cсылке](http://127.0.0.1:5500/pages/index_1.html) 
 
 Пример рабочего сайта можно посмотреть [по данной ссылке на Github Pages](https://srgmarkov.github.io/books_parser/pages/index_1.html)
